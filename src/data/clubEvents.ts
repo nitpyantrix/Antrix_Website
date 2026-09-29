@@ -65,7 +65,7 @@ export const clubEvents: ClubEvent[] = [
     registrationStatus: 'Open',
     bannerImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
     capacity: 'Open to All Students & Faculty',
-    leadCoordinator: 'Jaikrishnan B. (President) & Core Team',
+    leadCoordinator: 'Dimitri Terell, Sourav (Club Heads) & Jaikrishnan P. (Project Head)',
     prerequisites: ['No prerequisites — open admission'],
     tags: ['Robotics', 'Aerospace', 'Electronics', 'Exhibition', 'Hardware'],
   },
@@ -82,7 +82,7 @@ export const clubEvents: ClubEvent[] = [
     registrationStatus: 'Completed',
     bannerImage: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1200&q=80',
     capacity: '200 Attendees',
-    leadCoordinator: 'Dr. Faculty Advisor',
+    leadCoordinator: 'Dr. Naveen Raj (Faculty Advisor)',
     tags: ['Astrophysics', 'JWST', 'Exoplanets', 'Guest Lecture'],
   },
   {

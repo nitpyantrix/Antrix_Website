@@ -33,7 +33,7 @@ export const projects: Project[] = [
     status: 'Flight Ready',
     team: [
       { name: 'Sneha R.', role: 'Mechanical & Gear Design' },
-      { name: 'Jaikrishnan B.', role: 'Firmware & Microstepping' }
+      { name: 'Jaikrishnan P.', role: 'Firmware & Microstepping' }
     ],
     image: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=1200&q=80',
     highlights: [
@@ -73,7 +73,7 @@ export const projects: Project[] = [
     technologies: ['ROS 2 Humble', 'Raspberry Pi 5', 'RPLiDAR A1', 'Differential Rocker-Bogie', 'OpenCV', 'Brushless DC Motors', 'PID Control'],
     status: 'Active Prototype',
     team: [
-      { name: 'Jaikrishnan B.', role: 'Systems Architecture & ROS 2' },
+      { name: 'Jaikrishnan P.', role: 'Project Head & Systems Architecture' },
       { name: 'Aditya S.', role: 'Suspension & Chassis Mechanics' },
       { name: 'Naveen T.', role: 'Motor Drivers & Power Bus' }
     ],
