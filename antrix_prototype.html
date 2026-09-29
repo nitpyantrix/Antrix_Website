@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANTRIX | Astronomy & Space Technology Club • NIT Puducherry</title>
+  <meta name="description" content="Antrix — The astronomy, space science and aerospace engineering student club at National Institute of Technology Puducherry.">
+  
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23070d1e'/><ellipse cx='50' cy='50' rx='36' ry='14' fill='none' stroke='%2322d3ee' stroke-width='2.5' transform='rotate(-30 50 50)'/><circle cx='50' cy='50' r='8' fill='%23ffffff'/><circle cx='78' cy='34' r='3.5' fill='%2338bdf8'/></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            space: {
+              950: '#030611',
+              900: '#070d1e',
+              850: '#0b1328',
+              800: '#101a35',
+              700: '#1a274c',
+              600: '#2a3b6e',
+            },
+            cosmic: {
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+            },
+            stellar: {
+              300: '#67e8f9',
+              400: '#22d3ee',
+              500: '#06b6d4',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom astronomy scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070d1e; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    .celestial-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .glass-nav {
+      background: rgba(7, 13, 30, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-space-950 text-slate-100 font-sans antialiased selection:bg-cosmic-500/30 selection:text-stellar-300 min-h-screen flex flex-col relative overflow-x-hidden">
+
+  <!-- Background Interactive Celestial Canvas -->
+  <canvas id="celestialCanvas" class="fixed inset-0 pointer-events-none z-0 celestial-grid"></canvas>
+
+  <!-- ======================== NAVBAR ======================== -->
+  <header id="mainNavbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-4 border-b border-white/5 bg-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a href="#home" onclick="switchTab('home')" class="flex items-center gap-3 group text-left">
+          <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-space-900 border border-slate-700/80 group-hover:border-stellar-400/50 transition-colors shadow-inner">
+            <svg class="w-5 h-5 text-stellar-400 group-hover:rotate-45 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"></ellipse>
+            </svg>
+            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cosmic-400 animate-ping opacity-75"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-display font-bold text-lg tracking-wider text-white">ANTRIX</span>
+              <span class="text-[10px] px-1.5 py-0.2 font-mono font-semibold bg-cosmic-600/30 text-cosmic-300 rounded border border-cosmic-500/30">NITPY</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-mono tracking-tight hidden sm:block">Astronomy & Space Tech Club</p>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Items -->
+        <nav class="hidden lg:flex items-center gap-1">
+          <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="home">Home</button>
+          <button onclick="switchTab('about')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="about">About</button>
+          <button onclick="switchTab('events')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="events">Events</button>
+          <button onclick="switchTab('projects')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="projects">Projects</button>
+          <button onclick="switchTab('gallery')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="gallery">Gallery</button>
+          <button onclick="switchTab('tracker')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850 flex items-center gap-1.5" data-tab="tracker">
+            Star Tracker
+            <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">Live</span>
+          </button>
+          <button onclick="switchTab('calendar')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="calendar">Cosmic Calendar</button>
+          <button onclick="switchTab('team')" class="nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850" data-tab="team">Team</button>
+        </nav>
+
+        <!-- Right Action Button -->
+        <div class="hidden sm:flex items-center gap-3">
+          <button onclick="switchTab('tracker')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 hover:from-cyan-400 hover:to-blue-500 border border-cyan-300/30 transition-all active:scale-95">
+            <svg class="w-4 h-4 text-cyan-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+            Explore the Sky →
+          </button>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <div class="flex sm:hidden items-center gap-2">
+          <button onclick="switchTab('tracker')" class="p-2 text-cyan-300 bg-space-850 border border-cyan-900/60 rounded-lg">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          </button>
+          <button onclick="toggleMobileMenu()" id="menuBtn" class="p-2 text-slate-300 hover:text-white rounded-lg bg-space-850 border border-slate-800">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown -->
+      <div id="mobileMenu" class="hidden lg:hidden mt-3 pt-3 pb-4 border-t border-slate-800 bg-space-900/95 backdrop-blur-xl rounded-2xl px-4 shadow-2xl space-y-1">
+        <button onclick="switchTab('home')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">Home</button>
+        <button onclick="switchTab('about')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">About</button>
+        <button onclick="switchTab('events')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">Events</button>
+        <button onclick="switchTab('projects')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">Projects</button>
+        <button onclick="switchTab('gallery')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">Gallery</button>
+        <button onclick="switchTab('tracker')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850 flex items-center justify-between">
+          <span>Star Tracker</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">Live</span>
+        </button>
+        <button onclick="switchTab('calendar')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">Cosmic Calendar</button>
+        <button onclick="switchTab('team')" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-space-850">Team</button>
+        <div class="pt-2">
+          <button onclick="switchTab('tracker')" class="w-full py-2.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-center">
+            Explore the Sky →
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================== MAIN PAGES CONTAINER ======================== -->
+  <main class="flex-1 relative z-10 pt-20">
+
+    <!-- 1. HOME PAGE -->
+    <div id="page-home" class="page-view space-y-16 sm:space-y-24">
+      <!-- Hero -->
+      <section class="min-h-[88vh] flex items-center justify-center pt-16 pb-12 text-center px-4">
+        <div class="max-w-4xl mx-auto space-y-7">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-space-900/80 border border-slate-700/80 text-xs text-slate-300 backdrop-blur-md shadow-lg shadow-black/40">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="font-mono text-[11px] text-stellar-300 font-semibold tracking-wide">NIT PUDUCHERRY ASTRONOMY & AEROSPACE</span>
+            <span class="text-slate-500">•</span>
+            <span class="font-mono text-[11px] text-slate-400">10.9850° N</span>
+          </div>
+
+          <div class="space-y-4">
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white font-display uppercase leading-[1.08]">
+              EXPLORE <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400">BEYOND</span> LIMITS.
+            </h1>
+            <p class="text-lg sm:text-2xl font-medium text-slate-300 font-display">
+              Antrix — the astronomy and space technology club of NIT Puducherry.
+            </p>
+            <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              Where student engineers, stargazers, and researchers unravel the cosmos through hands-on telescope observation, rocket telemetry, embedded avionics, autonomous planetary robotics, and deep-space imaging.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button onclick="switchTab('tracker')" class="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 hover:from-cyan-400 hover:to-blue-500 border border-cyan-300/30 transition-all flex items-center justify-center gap-2">
+              <svg class="w-5 h-5 text-cyan-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+              Explore the Sky
+            </button>
+            <button onclick="switchTab('about')" class="w-full sm:w-auto px-6 py-3 rounded-lg font-medium bg-space-850 hover:bg-space-800 text-slate-200 border border-slate-700/80 transition-all flex items-center justify-center gap-2">
+              <svg class="w-5 h-5 text-cosmic-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10 10 4 4m0 0 5-5m-5 5-9 9m9-9-5 5"></path><circle cx="6" cy="6" r="3"></circle></svg>
+              Discover Antrix
+            </button>
+          </div>
+
+          <!-- Highlight Chips -->
+          <div class="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
+            <div class="p-3.5 rounded-xl bg-space-900/70 border border-slate-800">
+              <span class="text-xs font-mono text-stellar-400 uppercase font-semibold">🔭 Optics</span>
+              <p class="text-sm font-bold text-white mt-1">8" Dobsonian</p>
+              <p class="text-[11px] text-slate-400">Motorized tracking</p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-space-900/70 border border-slate-800">
+              <span class="text-xs font-mono text-cosmic-400 uppercase font-semibold">📡 Telemetry</span>
+              <p class="text-sm font-bold text-white mt-1">433MHz LoRa</p>
+              <p class="text-[11px] text-slate-400">Long-range CanSat</p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-space-900/70 border border-slate-800">
+              <span class="text-xs font-mono text-indigo-400 uppercase font-semibold">🤖 Robotics</span>
+              <p class="text-sm font-bold text-white mt-1">SANKALP-1</p>
+              <p class="text-[11px] text-slate-400">ROS 2 rocker-bogie</p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-space-900/70 border border-slate-800">
+              <span class="text-xs font-mono text-emerald-400 uppercase font-semibold">🌌 Site Datum</span>
+              <p class="text-sm font-bold text-white mt-1">Bortle Class 4</p>
+              <p class="text-[11px] text-slate-400">Coastal dark corridor</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Signature Section: Tonight at NITPY -->
+      <section class="py-16 bg-space-950 border-y border-slate-800/80 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto space-y-10">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-stellar-400 animate-pulse"></span>
+                <span class="text-xs uppercase font-mono tracking-widest text-stellar-400 font-semibold">OBSERVATORY TELEMETRY</span>
+              </div>
+              <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white font-display">TONIGHT AT NITPY</h2>
+              <p class="text-sm text-slate-400 mt-1">What's happening in the sky above us right now?</p>
+            </div>
+            <button onclick="switchTab('tracker')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md">
+              Open Star Tracker →
+            </button>
+          </div>
+
+          <!-- 4 Main Telemetry Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Moon Card -->
+            <div class="bg-space-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-xs font-mono text-slate-400 uppercase">🌔 Lunar Phase</span>
+                  <span class="text-2xl">🌔</span>
+                </div>
+                <h3 class="font-display font-bold text-xl text-white">72% Illuminated</h3>
+                <p class="text-xs text-stellar-300 font-medium mt-0.5">Waxing Gibbous</p>
+                <div class="mt-4 pt-3 border-t border-slate-800 space-y-1 text-xs font-mono text-slate-300">
+                  <div class="flex justify-between"><span class="text-slate-400">Moonrise:</span><span>16:48 IST</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Moonset:</span><span>04:22 IST</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Altitude:</span><span class="text-stellar-300">48° Above SE</span></div>
+                </div>
+              </div>
+              <div class="mt-3 text-[10px] font-mono text-slate-400 text-right">Age: 9.8 days</div>
+            </div>
+
+            <!-- Best Window -->
+            <div class="bg-space-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-xs font-mono text-slate-400 uppercase">⏱️ Observation Window</span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">Excellent</span>
+                </div>
+                <h3 class="font-display font-bold text-xl text-white">9:00 PM – 11:30 PM</h3>
+                <p class="text-xs text-emerald-400 font-medium mt-0.5">Clear coastal seeing</p>
+                <div class="mt-4 pt-3 border-t border-slate-800 space-y-1 text-xs font-mono text-slate-300">
+                  <div class="flex justify-between"><span class="text-slate-400">Cloud Cover:</span><span class="text-emerald-300">12%</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Humidity:</span><span>68%</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Seeing Index:</span><span class="text-stellar-300">Pickering 7/10</span></div>
+                </div>
+              </div>
+              <div class="mt-3 text-[10px] font-mono text-slate-400 text-right">Optics: 80–200mm</div>
+            </div>
+
+            <!-- Visible Planets -->
+            <div class="bg-space-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-xs font-mono text-slate-400 uppercase">🪐 Visible Planets</span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">3 Prime</span>
+                </div>
+                <h3 class="font-display font-bold text-xl text-white">Saturn • Jupiter • Mars</h3>
+                <p class="text-xs text-amber-300 font-medium mt-0.5">High altitude evening & dawn</p>
+                <div class="mt-4 pt-3 border-t border-slate-800 space-y-1 text-xs font-mono text-slate-300">
+                  <div class="flex justify-between"><span class="text-slate-400">Saturn:</span><span class="text-amber-300">42° SW (Rings visible)</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Jupiter:</span><span class="text-amber-300">64° E (4 Moons)</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Mars:</span><span class="text-amber-300">28° ENE (Orange disc)</span></div>
+                </div>
+              </div>
+              <div class="mt-3 text-[10px] font-mono text-slate-400 text-right">Magnitude: down to -2.4</div>
+            </div>
+
+            <!-- Overhead Constellations -->
+            <div class="bg-space-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-xs font-mono text-slate-400 uppercase">✨ Overhead Stars</span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">Zenith</span>
+                </div>
+                <h3 class="font-display font-bold text-xl text-white">Orion • Taurus • Canis Major</h3>
+                <p class="text-xs text-cyan-300 font-medium mt-0.5">Anchoring tonight's sky tour</p>
+                <div class="mt-4 pt-3 border-t border-slate-800 space-y-1 text-xs font-mono text-slate-300">
+                  <div class="flex justify-between"><span class="text-slate-400">Sirius:</span><span>Mag -1.46 (38° SE)</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Betelgeuse:</span><span>Mag +0.50 (55° ESE)</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Pleiades:</span><span class="text-cyan-300">M45 (68° ENE)</span></div>
+                </div>
+              </div>
+              <div class="mt-3 text-[10px] font-mono text-slate-400 text-right">Datum: NITPY Campus</div>
+            </div>
+          </div>
+
+          <!-- Visible Planets Grid -->
+          <div class="space-y-4">
+            <h3 class="text-xs uppercase font-mono tracking-wider text-slate-300 font-semibold">Tonight's Planetary Horizon Breakdown</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="homePlanetsGrid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cosmic Events Preview -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <span class="text-xs uppercase font-mono tracking-widest text-stellar-400 font-semibold">ASTRONOMICAL PHENOMENA</span>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white font-display">COSMIC EVENTS PREVIEW</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Key celestial events approaching our sky calendar.</p>
+          </div>
+          <button onclick="switchTab('calendar')" class="text-xs font-semibold text-stellar-400 hover:text-stellar-300 transition-colors">
+            View Full Cosmic Calendar →
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="homeCosmicPreview">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- Upcoming Antrix Club Activities -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-space-900 to-space-950 border border-slate-800 space-y-8">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <span class="text-xs uppercase font-mono tracking-widest text-cosmic-400 font-semibold">CLUB ACTIVITIES</span>
+              <h2 class="text-2xl sm:text-3xl font-bold text-white font-display">UPCOMING ANTRIX EVENTS</h2>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">Workshops, telescope nights, and engineering project showcases.</p>
+            </div>
+            <button onclick="switchTab('events')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-cosmic-600 text-white hover:bg-cosmic-500">
+              View All Club Events →
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="homeClubEventsPreview">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 2. ABOUT PAGE -->
+    <div id="page-about" class="page-view hidden py-12 space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto space-y-4">
+        <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">WHO WE ARE & OUR MISSION</span>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white font-display">Pioneering Space Science on the Puducherry Coast</h1>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          Antrix is the student-driven technical and astronomical hub of NIT Puducherry, bridging theoretical astrophysics with real-world aerospace engineering, robotics, and hands-on stargazing.
+        </p>
+      </div>
+
+      <!-- Mission Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-2xl bg-space-900 border border-slate-800 space-y-3">
+          <div class="text-2xl">🎯</div>
+          <h3 class="font-display font-bold text-lg text-white">Our Mission</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            To inspire and equip undergraduate students to demystify the cosmos through active observation, autonomous embedded robotics, open-source astrophysics code, and aerospace experimentation.
+          </p>
+        </div>
+        <div class="p-6 rounded-2xl bg-space-900 border border-slate-800 space-y-3">
+          <div class="text-2xl">🤝</div>
+          <h3 class="font-display font-bold text-lg text-white">Collaborative Learning</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            We operate as an open incubator where curious freshmen pair with senior engineers across physics, electronics, mechanical, and computing domains to build functional space tech.
+          </p>
+        </div>
+        <div class="p-6 rounded-2xl bg-space-900 border border-slate-800 space-y-3">
+          <div class="text-2xl">🔭</div>
+          <h3 class="font-display font-bold text-lg text-white">Scientific Credibility</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Our initiatives prioritize rigorous calibration, empirical data collection, and reproducible engineering — maintaining academic standards guided by department mentors.
+          </p>
+        </div>
+      </div>
+
+      <!-- What We Do: 6 Technical Wings -->
+      <div class="space-y-6">
+        <h2 class="text-2xl font-bold text-white font-display">WHAT WE DO</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="aboutWingsGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Our Journey Timeline -->
+      <div class="space-y-6">
+        <h2 class="text-2xl font-bold text-white font-display">OUR JOURNEY</h2>
+        <div class="relative border-l-2 border-slate-800 ml-4 pl-6 space-y-8" id="aboutTimeline">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. EVENTS PAGE -->
+    <div id="page-events" class="page-view hidden py-12 space-y-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">CLUB CALENDAR</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-display mt-1">ANTRIX CLUB EVENTS</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Observation camps, avionics workshops, and project showcases on campus.</p>
+      </div>
+
+      <!-- Featured Event Banner -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-slate-700/80 shadow-2xl flex flex-col md:flex-row gap-6 items-center">
+        <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80" alt="Observation Night" class="w-full md:w-1/2 h-56 object-cover rounded-2xl">
+        <div class="space-y-3 flex-1">
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase font-semibold">Featured Flagship</span>
+          <h3 class="text-2xl font-bold text-white font-display">Star-Party & Deep-Sky Observation Night</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Night sky exploration using the club's 8-inch motorized Dobsonian and 120mm refractor telescopes. Targeting Saturn's rings, Orion Nebula (M42), and Pleiades cluster.
+          </p>
+          <div class="text-xs font-mono text-slate-400 space-y-1">
+            <p>📅 Saturday, October 17, 2026 • 20:00 – 01:00 IST</p>
+            <p>📍 NIT Puducherry Central Sports Ground</p>
+          </div>
+          <div class="pt-2 flex gap-3">
+            <button onclick="openRegistrationModal('Star-Party & Deep-Sky Observation Night')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-cosmic-600 text-white hover:bg-cosmic-500">
+              Register for Telescope Slot
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events Filter Tabs -->
+      <div class="flex border-b border-slate-800 gap-2">
+        <button onclick="filterClubEvents('upcoming')" id="tab-ev-upcoming" class="ev-tab-btn pb-3 px-4 text-xs sm:text-sm font-semibold text-white border-b-2 border-stellar-400">Upcoming</button>
+        <button onclick="filterClubEvents('ongoing')" id="tab-ev-ongoing" class="ev-tab-btn pb-3 px-4 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent">Ongoing</button>
+        <button onclick="filterClubEvents('past')" id="tab-ev-past" class="ev-tab-btn pb-3 px-4 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent">Past Archive</button>
+      </div>
+
+      <!-- Events Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="clubEventsGrid">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- 4. PROJECTS PAGE -->
+    <div id="page-projects" class="page-view hidden py-12 space-y-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">HARDWARE & SOFTWARE</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-display mt-1">TECHNICAL PROJECTS</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Student research prototypes in avionics, planetary robotics, and harmonic star trackers.</p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800" id="projectCategoryFilters">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Projects Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- 5. GALLERY PAGE -->
+    <div id="page-gallery" class="page-view hidden py-12 space-y-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">OBSERVATORY & CLUB MEDIA</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-display mt-1">ASTROPHOTOGRAPHY & GALLERY</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Visual logs of planetary imaging, deep sky stacking, and rocket payload trials.</p>
+      </div>
+
+      <!-- Gallery Category Filters -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800" id="galleryCategoryFilters">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Gallery Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="galleryGrid">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- 6. STAR TRACKER PAGE (SIGNATURE DASHBOARD) -->
+    <div id="page-tracker" class="page-view hidden py-10 space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">VIRTUAL PLANISPHERE</span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-display">STAR TRACKER</h1>
+          <p class="text-sm text-slate-300">Explore the night sky above <span class="text-cyan-300 font-medium">NIT Puducherry (10.9850° N, 79.8450° E)</span>.</p>
+        </div>
+        <div class="text-xs font-mono bg-space-900 px-3 py-1.5 rounded-xl border border-slate-800 text-slate-300">
+          📍 Karaikal Coastal Datum • Zenith Calibrated
+        </div>
+      </div>
+
+      <!-- Tracker Controls -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-space-900 border border-slate-800 shadow-xl space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          <div class="md:col-span-5 relative">
+            <input type="text" id="trackerSearch" oninput="renderSkyMap()" placeholder="Search star, planet, or nebula (e.g. Sirius, Jupiter)..." class="w-full px-3 py-2 bg-space-850 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-stellar-400">
+          </div>
+          <div class="md:col-span-4 flex items-center gap-2">
+            <input type="date" value="2026-10-17" class="px-2.5 py-1.5 rounded-xl bg-space-850 border border-slate-700 text-xs font-mono text-slate-200">
+            <input type="time" value="21:30" class="px-2.5 py-1.5 rounded-xl bg-space-850 border border-slate-700 text-xs font-mono text-slate-200">
+          </div>
+          <div class="md:col-span-3">
+            <select id="quickTargetSelect" onchange="selectTargetById(this.value)" class="w-full px-3 py-2 bg-space-850 border border-slate-700 rounded-xl text-xs text-slate-200 font-mono">
+              <!-- Rendered via JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-slate-400 font-mono text-[11px] uppercase mr-1">Toggles:</span>
+            <button onclick="toggleTrackerLayer('constellations')" id="toggleConst" class="px-2.5 py-1 rounded-lg border font-mono bg-indigo-950 text-indigo-300 border-indigo-700">✦ Constellations</button>
+            <button onclick="toggleTrackerLayer('planets')" id="togglePlanets" class="px-2.5 py-1 rounded-lg border font-mono bg-amber-950 text-amber-300 border-amber-700">🪐 Planets</button>
+            <button onclick="toggleTrackerLayer('dso')" id="toggleDSO" class="px-2.5 py-1 rounded-lg border font-mono bg-purple-950 text-purple-300 border-purple-700">🌌 Deep Sky</button>
+            <button onclick="toggleTrackerLayer('grid')" id="toggleGrid" class="px-2.5 py-1 rounded-lg border font-mono bg-cyan-950 text-cyan-300 border-cyan-700">⊕ Alt/Az Grid</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Tab Switcher for Tracker -->
+      <div class="lg:hidden flex rounded-xl bg-space-900 p-1 border border-slate-800 text-xs">
+        <button onclick="switchTrackerMobileView('map')" id="mobileViewMapBtn" class="flex-1 py-2 rounded-lg bg-space-800 text-white font-bold">Interactive Sky Map</button>
+        <button onclick="switchTrackerMobileView('inspector')" id="mobileViewInspBtn" class="flex-1 py-2 rounded-lg text-slate-400">Target Inspector</button>
+      </div>
+
+      <!-- Map & Inspector Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Interactive Sky Map Canvas -->
+        <div id="trackerMapCol" class="lg:col-span-8 relative w-full h-[450px] sm:h-[550px] lg:h-[600px] rounded-2xl overflow-hidden bg-space-950 border border-slate-800 shadow-2xl flex items-center justify-center select-none">
+          <canvas id="skyMapCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+          
+          <div class="absolute top-4 right-4 flex flex-col gap-1.5 z-20">
+            <button onclick="zoomSkyMap(0.2)" class="p-2 rounded-lg bg-space-900/90 text-white border border-slate-700 shadow font-mono text-sm">+</button>
+            <button onclick="zoomSkyMap(-0.2)" class="p-2 rounded-lg bg-space-900/90 text-white border border-slate-700 shadow font-mono text-sm">−</button>
+            <button onclick="resetSkyMap()" class="p-2 rounded-lg bg-space-900/90 text-white border border-slate-700 shadow text-xs">⟲</button>
+          </div>
+
+          <div class="absolute bottom-4 left-4 z-20 text-[10px] font-mono text-slate-400 bg-space-900/80 px-3 py-1 rounded-lg border border-slate-800">
+            LAT: 10.9850° N • LON: 79.8450° E • FOV: <span id="fovReadout">180°</span>
+          </div>
+        </div>
+
+        <!-- Target Inspector Panel -->
+        <div id="trackerInspectorCol" class="lg:col-span-4 space-y-4">
+          <div id="targetInspectorCard" class="bg-space-900 border border-slate-700/80 rounded-2xl p-5 shadow-2xl space-y-4">
+            <!-- Rendered via JS -->
+          </div>
+
+          <div class="p-4 rounded-2xl bg-space-900 border border-slate-800 space-y-2">
+            <h4 class="text-xs font-mono uppercase text-slate-400 font-semibold">Popular Overhead Targets Tonight</h4>
+            <div class="flex flex-wrap gap-1.5" id="quickTargetsChips">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. COSMIC CALENDAR PAGE -->
+    <div id="page-calendar" class="page-view hidden py-12 space-y-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">ASTRONOMICAL EPHEMERIS</span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-display mt-1">COSMIC CALENDAR</h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Chronological almanac of meteor showers, planetary conjunctions, and space flights.</p>
+        </div>
+        <button onclick="toggleOnlyNITPY()" id="btnOnlyNITPY" class="px-3.5 py-1.5 rounded-full text-xs font-mono border bg-space-850 text-slate-300 border-slate-700 hover:text-white flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+          Visible from NIT Puducherry
+        </button>
+      </div>
+
+      <!-- Calendar Category Filters -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800" id="cosmicCategoryFilters">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Cosmic Events Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="cosmicEventsGrid">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- 8. TEAM PAGE -->
+    <div id="page-team" class="page-view hidden py-12 space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-widest text-stellar-400 font-semibold">PEOPLE & PASSION</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-display mt-1">THE ANTRIX CREW</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Meet the faculty advisors, student wing leads, and researchers at NIT Puducherry.</p>
+      </div>
+
+      <!-- Faculty Advisors -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-bold text-white font-display">Faculty Advisors & Research Mentors</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl" id="teamFacultyGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Core Leads -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-bold text-white font-display">Core Technical Leads (2025–2026)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="teamCoreGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Members Grid -->
+      <div class="space-y-4">
+        <h3 class="text-xl font-bold text-white font-display">Active Student Researchers & Observers</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="teamMembersGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Inductions Banner -->
+      <div class="p-8 rounded-3xl bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-slate-800 text-center space-y-3">
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">Recruitment</span>
+        <h3 class="text-2xl font-bold text-white font-display">Want to Join Antrix?</h3>
+        <p class="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
+          Inductions take place every semester across observational astronomy, avionics, electronics, and robotics. All branches and years welcome.
+        </p>
+        <div class="pt-2">
+          <a href="mailto:antrix@nitpy.ac.in" class="inline-block px-5 py-2.5 rounded-lg bg-cosmic-600 text-white font-semibold text-xs sm:text-sm">
+            Contact Recruitment Lead
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================== FOOTER ======================== -->
+  <footer class="mt-20 bg-space-950 border-t border-slate-800/80 pt-16 pb-12 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="font-display font-bold text-lg text-white">ANTRIX</span>
+            <span class="text-xs font-mono text-cosmic-400 bg-cosmic-950/60 px-2 py-0.5 rounded border border-cosmic-800">NITPY</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            The astronomy and space technology student club of National Institute of Technology Puducherry.
+          </p>
+          <p class="text-xs font-mono text-slate-400">10.9850° N, 79.8450° E • Thiruvettakudy, Karaikal</p>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-mono uppercase text-slate-300 font-semibold">Exploration</h4>
+          <ul class="text-xs text-slate-400 space-y-1.5">
+            <li><button onclick="switchTab('tracker')" class="hover:text-stellar-300">Interactive Star Tracker</button></li>
+            <li><button onclick="switchTab('calendar')" class="hover:text-stellar-300">Cosmic Calendar</button></li>
+            <li><button onclick="switchTab('gallery')" class="hover:text-stellar-300">Astrophotography Gallery</button></li>
+            <li><button onclick="switchTab('about')" class="hover:text-stellar-300">About Antrix</button></li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-mono uppercase text-slate-300 font-semibold">Engineering</h4>
+          <ul class="text-xs text-slate-400 space-y-1.5">
+            <li><button onclick="switchTab('projects')" class="hover:text-cosmic-300">Hardware & Software Projects</button></li>
+            <li><button onclick="switchTab('events')" class="hover:text-cosmic-300">Workshops & Expos</button></li>
+            <li><button onclick="switchTab('team')" class="hover:text-cosmic-300">Core Team & Mentors</button></li>
+            <li><a href="https://www.nitpy.ac.in" target="_blank" class="hover:text-cosmic-300">NITPY Official Portal ↗</a></li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-mono uppercase text-slate-300 font-semibold">Connect</h4>
+          <p class="text-xs text-slate-400">antrix@nitpy.ac.in</p>
+          <div class="pt-2">
+            <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded">
+              ● Telemetry Beacon: Operational
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
+        <p>© 2026 ANTRIX Club, NIT Puducherry. Designed for scientific & educational exploration.</p>
+        <p class="font-mono text-[11px]">STN: NITPY-OBS-01 • ELEV: 8m MSL • BORTLE: 4.2</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================== GENERIC MODAL ======================== -->
+  <div id="genericModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-space-950/80 backdrop-blur-md" onclick="closeModal()"></div>
+    <div class="relative w-full max-w-xl bg-space-900 border border-slate-700 rounded-2xl shadow-2xl z-10 flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-space-850">
+        <div>
+          <h3 id="modalTitle" class="text-lg font-semibold text-white font-display">Modal Title</h3>
+          <p id="modalSubtitle" class="text-xs text-slate-400 mt-0.5">Modal Subtitle</p>
+        </div>
+        <button onclick="closeModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-space-800">✕</button>
+      </div>
+      <div id="modalBody" class="p-6 overflow-y-auto space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- ======================== LIGHTBOX MODAL ======================== -->
+  <div id="lightboxModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+    <div class="fixed inset-0 bg-space-950/95 backdrop-blur-xl" onclick="closeLightbox()"></div>
+    <div class="relative z-10 w-full max-w-5xl bg-space-900 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      <div class="flex items-center justify-between px-6 py-3.5 border-b border-slate-800 bg-space-850">
+        <span id="lightboxTitle" class="font-display font-bold text-white text-base truncate">Image Title</span>
+        <button onclick="closeLightbox()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-space-800">✕</button>
+      </div>
+      <div class="relative flex-1 bg-black flex items-center justify-center min-h-[350px] overflow-hidden">
+        <img id="lightboxImg" src="" alt="Preview" class="max-h-[62vh] max-w-full object-contain">
+        <button onclick="prevLightbox()" class="absolute left-4 p-2.5 rounded-full bg-space-900/80 text-white border border-slate-700">❮</button>
+        <button onclick="nextLightbox()" class="absolute right-4 p-2.5 rounded-full bg-space-900/80 text-white border border-slate-700">❯</button>
+      </div>
+      <div class="p-5 bg-space-900 border-t border-slate-800 space-y-2">
+        <p id="lightboxDesc" class="text-xs sm:text-sm text-slate-300"></p>
+        <p id="lightboxMeta" class="text-xs font-mono text-cyan-300"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SCRIPT DATA & APP LOGIC ======================== -->
+  <script>
+    /* Mock Data Arrays */
+    const planets = [
+      { name: 'Saturn', alt: '42°', mag: '+0.6', dir: 'SW', time: '20:30–22:45', icon: '🪐', highlight: 'Rings tilted at ~9°, Titan visible in 80mm refractor' },
+      { name: 'Jupiter', alt: '64°', mag: '-2.4', dir: 'East', time: '21:15–02:00', icon: '🟠', highlight: 'Great Red Spot and 4 Galilean moons visible' },
+      { name: 'Mars', alt: '28°', mag: '+0.8', dir: 'ENE', time: '23:00–Dawn', icon: '🔴', highlight: 'Distinct rust-orange disc rising near Taurus' },
+      { name: 'Venus', alt: '18°', mag: '-4.1', dir: 'East (Dawn)', time: '04:45–05:40', icon: '✨', highlight: 'Brilliant morning star with 81% illuminated disc' }
+    ];
+
+    const cosmicEvents = [
+      { id: 1, name: 'Perseid Meteor Shower Peak', cat: 'Meteor Shower', icon: '🌠', date: 'August 12–13, 2026', time: '01:00–04:30 IST', isNITPY: true, desc: 'One of the most prolific annual meteor showers produced by Comet Swift-Tuttle, yielding swift, bright meteors with persistent ion trails.', tips: 'Head to the dark open grounds near NITPY Sports Complex. Face Perseus/Cassiopeia away from campus lights.' },
+      { id: 2, name: 'Saturn at Opposition', cat: 'Planetary', icon: '🪐', date: 'September 21, 2026', time: 'All Night', isNITPY: true, desc: 'Saturn is directly opposite the Sun in our sky, positioned closest to Earth. The gas giant shines at its brightest with rings dramatically illuminated.', tips: 'Visible to naked eye as a golden star in Aquarius; 4" scope resolves Cassini Division.' },
+      { id: 3, name: 'Super Sturgeon Full Moon', cat: 'Lunar', icon: '🌕', date: 'August 28, 2026', time: '19:42 IST Moonrise', isNITPY: true, desc: 'Moon reaches perigee syzygy, appearing up to 14% larger and 30% brighter over the Karaikal coastline.', tips: 'Watch moonrise directly over the Bay of Bengal coastline 1.5 km from NITPY campus.' },
+      { id: 4, name: 'Penumbral Lunar Eclipse', cat: 'Eclipse', icon: '🌑', date: 'October 14, 2026', time: '22:15–02:40 IST', isNITPY: true, desc: 'The Moon passes through the outer fuzzy edge of Earth\'s shadow. Tea-colored shading over northern limb.', tips: 'Subtle eclipse. Astrophotography with telephoto lens reveals dark gradient.' },
+      { id: 5, name: 'Great Mars & Jupiter Conjunction', cat: 'Planetary', icon: '🪐', date: 'November 16, 2026', time: '03:15–05:10 IST', isNITPY: true, desc: 'Mars and Jupiter appear within 0°18\' of each other in dawn sky, easily fitting within telescope field of view.', tips: 'Spectacular astrophotography opportunity. Fit both planets at 60x-120x.' },
+      { id: 6, name: 'Artemis II Lunar Orbital Window', cat: 'Space Mission', icon: '🚀', date: 'Late 2026', time: 'T-0 TBD', isNITPY: false, desc: 'First crewed flight test of Orion spacecraft around the Moon and back.', tips: 'Student radio stations worldwide will monitor trans-lunar S-band frequencies.' }
+    ];
+
+    const clubEvents = [
+      { id: 1, title: 'Star-Party & Deep-Sky Observation Night', status: 'upcoming', cat: '🔭 Stargazing', date: 'Oct 17, 2026', time: '20:00–01:00 IST', loc: 'NITPY Central Sports Ground', reg: 'Open', img: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80', desc: 'All-night stargazing party targeting the Moon craters, Saturn rings, and Orion Nebula with club Dobsonians.' },
+      { id: 2, title: 'CanSat & Telemetry Hardware Workshop', status: 'upcoming', cat: '⚡ Workshop', date: 'Oct 24–25, 2026', time: '10:00–17:00 IST', loc: 'Embedded Lab, NITPY', reg: 'Open', img: 'https://images.unsplash.com/photo-1517976487507-5b3b4b45f9da?auto=format&fit=crop&w=600&q=80', desc: 'Hands-on bootcamp soldering and coding a complete CanSat with LoRa telemetry and sensor array.' },
+      { id: 3, title: 'Astrophotography & Image Stacking Masterclass', status: 'upcoming', cat: '📷 Astrophoto', date: 'Nov 07, 2026', time: '18:30–22:30 IST', loc: 'Terrace Observation Deck', reg: 'Upcoming', img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80', desc: 'From sensor calibration to stacking: capturing deep-sky nebulae and processing in Siril.' },
+      { id: 4, title: 'Electronics & Aerospace Project Expo', status: 'upcoming', cat: '🚀 Showcase', date: 'Nov 28, 2026', time: '09:30–16:30 IST', loc: 'NITPY Student Activity Centre', reg: 'Open', img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80', desc: 'Annual club exhibition showcasing student rovers, tracking antenna arrays, and avionics testbeds.' },
+      { id: 5, title: 'Guest Lecture: JWST Insights on Early Universe', status: 'past', cat: '🎓 Lecture', date: 'Sep 12, 2026', time: '16:00–18:00 IST', loc: 'Auditorium, NITPY', reg: 'Completed', img: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80', desc: 'Technical lecture on high-redshift galaxy evolution and exoplanetary atmospheric spectroscopy.' },
+      { id: 6, title: 'Messier Marathon Camp', status: 'past', cat: '🔭 Stargazing', date: 'Mar 18, 2026', time: 'Dusk to Dawn', loc: 'Coastal Dark Sky Site', reg: 'Completed', img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=600&q=80', desc: 'Dusk-to-dawn endurance stargazing challenge verifying 48 Messier deep-sky objects.' }
+    ];
+
+    const projects = [
+      { id: 1, name: 'RC Aircraft Long-Range Telemetry & Flight Controller', cat: 'Aerospace', status: 'Active Prototype', tech: ['ESP32-S3', 'nRF24L01', 'SX1278 LoRa', 'Pitot Airspeed', 'FreeRTOS'], img: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=600&q=80', team: 'Aditya S., Karthik V., Meera N.', desc: 'Avionics package combining 433MHz LoRa link, Pitot-static airspeed sensing, and fail-safe return-to-home algorithms tested up to 4.2 km range.' },
+      { id: 2, name: 'Harmonic-Drive Automated Star Tracker Alt-Az Mount', cat: 'Astronomy', status: 'Flight Ready', tech: ['Arduino Mega', 'TMC2209 Drivers', 'OnStep', 'SolidWorks CAD', 'PETG 3D'], img: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=600&q=80', team: 'Sneha R., Jaikrishnan B.', desc: 'Motorized equatorial tracking mount using 50:1 harmonic strain-wave gears to eliminate star trailing in long-exposure DSLR astrophotography.' },
+      { id: 3, name: 'Atmospheric Research CanSat Payload', cat: 'Space Technology', status: 'Completed', tech: ['RP2040 Pico', 'BMP388 Baro', 'VEML6075 UV', 'LoRa 868MHz'], img: 'https://images.unsplash.com/photo-1517976487507-5b3b4b45f9da?auto=format&fit=crop&w=600&q=80', team: 'Pooja M., Rohan K.', desc: 'Canister-sized satellite payload sampling pressure, altitude, UV radiation, and atmospheric dust during parachute descent from 1,000 meters.' },
+      { id: 4, name: 'SANKALP-1 Autonomous Planetary Rover Prototype', cat: 'Robotics', status: 'Active Prototype', tech: ['ROS 2 Humble', 'Raspberry Pi 5', 'RPLiDAR A1', 'Rocker-Bogie', 'OpenCV'], img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=600&q=80', team: 'Jaikrishnan B., Aditya S., Naveen T.', desc: 'Six-wheel rocker-bogie exploration rover capable of autonomous 2D LiDAR SLAM mapping and climbing obstacles up to 20 cm.' },
+      { id: 5, name: 'AstroStack: Deep-Sky Image Calibration Pipeline', cat: 'Astronomy', status: 'Completed', tech: ['Python 3.11', 'Astropy', 'NumPy', 'OpenCV', 'RawPy'], img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80', team: 'Karthik V., Pooja M.', desc: 'High-throughput computational software calibrating dark/flat frames and performing sigma-clipped median stacking to boost signal-to-noise ratio by 4.2x.' },
+      { id: 6, name: 'Automated Ground Station & NOAA Weather Satellite Decoder', cat: 'Electronics', status: 'Flight Ready', tech: ['RTL-SDR v4', 'V-Dipole Antenna', 'SatDump', 'Raspberry Pi 4'], img: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?auto=format&fit=crop&w=600&q=80', team: 'Sneha R., Rohan K.', desc: 'Rooftop SDR receiving station automatically recording Doppler-corrected APT/LRPT cloud imagery of the Indian Ocean subcontinent.' }
+    ];
+
+    const gallery = [
+      { id: 1, title: 'The Great Orion Nebula (M42 & M43)', cat: 'Astronomy', date: 'Feb 2026', loc: 'NITPY Dark Sky Site', img: 'https://images.unsplash.com/photo-1543722530-d2c3201371e7?auto=format&fit=crop&w=800&q=80', desc: 'Star nursery 1,344 light-years away in Orion. Captured using modified DSLR stacked on club star tracker.', equip: 'Sky-Watcher 100ED Refractor + Sony A7III' },
+      { id: 2, title: 'Telescope Stargazing Night at Central Grounds', cat: 'Telescope Sessions', date: 'Oct 2025', loc: 'NIT Puducherry Sports Ground', img: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80', desc: 'Students queuing up at the 8-inch Dobsonian to get their first glimpse of Saturn\'s rings.', equip: 'Antrix 8" f/6 Dobsonian' },
+      { id: 3, title: 'CanSat Avionics Assembly & Solder Lab', cat: 'Workshops', date: 'Nov 2025', loc: 'ECE Lab, NITPY', img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80', desc: 'Participants soldering surface-mount sensor breakout boards and tuning the 433MHz LoRa transmitter antenna.', equip: 'Rigol DS1054Z Oscilloscope' },
+      { id: 4, title: 'Waxing Gibbous Moon & Mare Tranquillitatis', cat: 'Astronomy', date: 'Jan 2026', loc: 'Terrace Observation Deck', img: 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?auto=format&fit=crop&w=800&q=80', desc: 'High-resolution lunar mosaic showing Copernicus ray system and Montes Apenninus range.', equip: '120mm Achromat Refractor + ZWO ASI120MC' },
+      { id: 5, title: 'SANKALP-1 Planetary Rover Sand-Bed Trials', cat: 'Projects', date: 'Mar 2026', loc: 'Karaikal Beach Dunes', img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80', desc: 'Testing 6-wheel rocker-bogie obstacle climb capability on loose sands near Thiruvettakudy.', equip: 'Custom Rocker-Bogie + ROS 2 SLAM' },
+      { id: 6, title: 'Pleiades Open Star Cluster (M45)', cat: 'Astronomy', date: 'Nov 2025', loc: 'Coastal Dark Site', img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80', desc: 'Reflection nebulae enveloping the hot blue B-type stars of the Seven Sisters in Taurus.', equip: 'Canon EOS 80D + 200mm f/2.8L' }
+    ];
+
+    const celestialObjects = [
+      { id: 'sirius', name: 'Sirius (Alpha Canis Majoris)', type: 'Star', mag: '-1.46', alt: '38° 14\'', az: '142° (SE)', const: 'Canis Major', dist: '8.6 Light-Years', vis: 'Naked Eye', ra: '06h 45m 09s', dec: '-16° 42\' 58"', color: '#e0f2fe', x: 68, y: 62, size: 9, desc: 'The brightest star in Earth\'s night sky. Sirius is a binary star system comprising a main-sequence star and a white dwarf companion.' },
+      { id: 'betelgeuse', name: 'Betelgeuse', type: 'Star', mag: '+0.50', alt: '55° 22\'', az: '110° (ESE)', const: 'Orion', dist: '642 Light-Years', vis: 'Naked Eye', ra: '05h 55m 10s', dec: '+07° 24\' 25"', color: '#f97316', x: 54, y: 44, size: 8, desc: 'A pulsating red supergiant marking the right shoulder of Orion. Nearing the supernova stage of its stellar evolution.' },
+      { id: 'rigel', name: 'Rigel', type: 'Star', mag: '+0.12', alt: '49° 08\'', az: '125° (SE)', const: 'Orion', dist: '860 Light-Years', vis: 'Naked Eye', ra: '05h 14m 32s', dec: '-08° 12\' 06"', color: '#93c5fd', x: 58, y: 51, size: 7.5, desc: 'A brilliant blue supergiant marking Orion\'s left foot. Over 60,000 times as luminous as our Sun.' },
+      { id: 'aldebaran', name: 'Aldebaran', type: 'Star', mag: '+0.85', alt: '62° 40\'', az: '85° (E)', const: 'Taurus', dist: '65 Light-Years', vis: 'Naked Eye', ra: '04h 35m 55s', dec: '+16° 30\' 33"', color: '#fdba74', x: 44, y: 37, size: 7, desc: 'The fiery eye of Taurus the Bull. An evolved red giant star roughly 44 times the solar diameter.' },
+      { id: 'jupiter', name: 'Jupiter', type: 'Planet', mag: '-2.40', alt: '64° 15\'', az: '95° (E)', const: 'Taurus', dist: '4.2 AU (628M km)', vis: 'Naked Eye', ra: '04h 12m 18s', dec: '+21° 04\' 12"', color: '#fef08a', x: 40, y: 35, size: 10, desc: 'Solar system\'s largest planet. Distinct cloud belts, Great Red Spot, and 4 Galilean moons clearly observable.' },
+      { id: 'saturn', name: 'Saturn', type: 'Planet', mag: '+0.60', alt: '42° 30\'', az: '210° (SSW)', const: 'Aquarius', dist: '9.1 AU (1.36B km)', vis: 'Naked Eye', ra: '22h 35m 44s', dec: '-10° 22\' 51"', color: '#fed7aa', x: 78, y: 57, size: 8.5, desc: 'Ringed jewel of the solar system. Ring inclination ~9° reveals shadow bands across the globe.' },
+      { id: 'mars', name: 'Mars', type: 'Planet', mag: '+0.80', alt: '28° 10\'', az: '75° (ENE)', const: 'Gemini', dist: '1.4 AU (210M km)', vis: 'Naked Eye', ra: '07h 08m 12s', dec: '+24° 40\' 19"', color: '#f87171', x: 32, y: 71, size: 7, desc: 'The Red Planet, illuminated by ferric oxide dust. Polar ice caps and dark albedo markings visible in telescopes.' },
+      { id: 'orion-nebula', name: 'Great Orion Nebula (M42)', type: 'Nebula', mag: '+4.0', alt: '51° 45\'', az: '118° (ESE)', const: 'Orion', dist: '1,344 Light-Years', vis: 'Binocular', ra: '05h 35m 17s', dec: '-05° 23\' 28"', color: '#a78bfa', x: 56, y: 48, size: 9, desc: 'A stellar nursery located south of Orion\'s belt. Ionized hydrogen gas glowing pinkish-violet energized by Trapezium cluster.' },
+      { id: 'andromeda', name: 'Andromeda Galaxy (M31)', type: 'Galaxy', mag: '+3.44', alt: '32° 18\'', az: '330° (NNW)', const: 'Andromeda', dist: '2.54M Light-Years', vis: 'Binocular', ra: '00h 42m 44s', dec: '+41° 16\' 09"', color: '#cbd5e1', x: 82, y: 28, size: 9.5, desc: 'A barred spiral galaxy and largest in Local Group. The most distant object visible to naked human eye.' },
+      { id: 'pleiades', name: 'Pleiades Cluster (M45)', type: 'Cluster', mag: '+1.60', alt: '68° 10\'', az: '70° (ENE)', const: 'Taurus', dist: '444 Light-Years', vis: 'Naked Eye', ra: '03h 47m 24s', dec: '+24° 07\' 00"', color: '#67e8f9', x: 36, y: 31, size: 8, desc: 'The Seven Sisters. Open cluster dominated by luminous hot blue B-type stars in gossamer reflection nebulosity.' },
+      { id: 'polaris', name: 'Polaris (North Star)', type: 'Star', mag: '+1.98', alt: '10° 59\'', az: '0° (Due North)', const: 'Ursa Minor', dist: '433 Light-Years', vis: 'Naked Eye', ra: '02h 31m 49s', dec: '+89° 15\' 51"', color: '#fef08a', x: 50, y: 89, size: 6.5, desc: 'Celestial navigational marker. True to NIT Puducherry\'s latitude (~10.98° N), Polaris hangs precisely 11° above horizon.' }
+    ];
+
+    const team = [
+      { name: 'Dr. G. Lakshmi Narayanan', role: 'Faculty Advisor & Patron', cat: 'faculty', dept: 'Physics & Applied Sciences', area: 'Observational Astrophysics, Optical Spectrometry', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Dr. R. Vigneshwaran', role: 'Technical Faculty Mentor', cat: 'faculty', dept: 'Electronics & Communication', area: 'Satellite Telemetry, Embedded RF Systems, SDR', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Jaikrishnan B.', role: 'Club President & Systems Lead', cat: 'core', dept: 'ECE • Final Year', area: 'Avionics, Autonomous Rover Navigation & Operations', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Sneha Ramachandran', role: 'Vice President & Aerospace Head', cat: 'core', dept: 'Mechanical • Final Year', area: 'Fixed-Wing Aerodynamics, CanSat Airframes', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Aditya Swaminathan', role: 'Astronomy & Observation Lead', cat: 'core', dept: 'EEE • 3rd Year', area: 'Optical Telescopes, Deep Sky Catalogues & Sky Tours', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Karthik Venkatesh', role: 'Astrophotography & Image Lead', cat: 'core', dept: 'CSE • 3rd Year', area: 'Computational Imaging, Siril Stacking Pipelines', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Pooja Mohan', role: 'Electronics & Sensor Lead', cat: 'core', dept: 'ECE • 3rd Year', area: 'LoRa 433/868MHz Telemetry & PCB Circuit Layouts', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Rohan Kulkarni', role: 'SDR Ground Station Researcher', cat: 'member', dept: 'ECE • 2nd Year', area: 'Weather Satellites, Doppler Tracking', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Meera Nambiar', role: 'Telemetry Dashboard Developer', cat: 'member', dept: 'CSE • 2nd Year', area: 'Real-time Sensor Visualisation & WebSockets', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Naveen Thevar', role: 'Robotics Chassis & Motor Control', cat: 'member', dept: 'Mechanical • 2nd Year', area: 'Rocker-Bogie Dynamics, BLDC Actuators', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&q=80' },
+      { name: 'Ananya Deshpande', role: 'Outreach & Astrophoto Apprentice', cat: 'member', dept: 'Civil • 1st Year', area: 'Constellation Mapping, Science Outreach', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80' }
+    ];
+
+    /* Navigation & Tabs */
+    let currentTab = 'home';
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+      const activePage = document.getElementById('page-' + tabId);
+      if (activePage) activePage.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = "nav-btn px-3 py-1.5 text-xs font-semibold rounded-md transition-colors text-white bg-space-800 border border-slate-700 shadow-sm flex items-center gap-1.5";
+        } else {
+          btn.className = "nav-btn px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-slate-300 hover:text-white hover:bg-space-850 flex items-center gap-1.5";
+        }
+      });
+
+      document.getElementById('mobileMenu').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (tabId === 'tracker') {
+        setTimeout(initSkyMap, 50);
+      }
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    /* Scroll Navbar Effect */
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('mainNavbar');
+      if (window.scrollY > 20) {
+        nav.classList.add('bg-space-950/90', 'backdrop-blur-md', 'shadow-lg', 'border-slate-800');
+        nav.classList.remove('bg-transparent', 'border-white/5');
+      } else {
+        nav.classList.remove('bg-space-950/90', 'backdrop-blur-md', 'shadow-lg', 'border-slate-800');
+        nav.classList.add('bg-transparent', 'border-white/5');
+      }
+    });
+
+    /* Rendering Tonight Planets */
+    function renderTonightPlanets() {
+      const container = document.getElementById('homePlanetsGrid');
+      if (!container) return;
+      container.innerHTML = planets.map(p => `
+        <div class="bg-space-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">${p.icon}</span>
+                <span class="font-bold text-white font-display">${p.name}</span>
+              </div>
+              <span class="text-[10px] font-mono text-cyan-300 bg-space-850 px-2 py-0.5 rounded border border-slate-700">Mag: ${p.mag}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono p-2 rounded-xl bg-space-850 border border-slate-800/80">
+              <div><span class="text-slate-500 block">Alt:</span><span class="text-white">${p.alt}</span></div>
+              <div><span class="text-slate-500 block">Dir:</span><span class="text-white">${p.dir}</span></div>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-snug">${p.highlight}</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-800 flex justify-between text-[11px] font-mono text-slate-400">
+            <span>Window:</span><span class="text-stellar-300 font-semibold">${p.time}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* Rendering Cosmic Preview */
+    function renderCosmicPreview() {
+      const container = document.getElementById('homeCosmicPreview');
+      if (!container) return;
+      container.innerHTML = cosmicEvents.slice(0, 3).map(e => `
+        <div class="bg-space-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-all">
+          <div class="space-y-2.5">
+            <div class="flex justify-between items-start">
+              <span class="text-2xl">${e.icon}</span>
+              <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800/60">NITPY Sky</span>
+            </div>
+            <span class="text-[10px] font-mono uppercase text-stellar-400 font-semibold block">${e.cat}</span>
+            <h3 class="font-display font-bold text-base text-white">${e.name}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2">${e.desc}</p>
+            <div class="pt-2 text-xs font-mono text-slate-300 space-y-1">
+              <div class="flex justify-between"><span class="text-slate-500">Date:</span><span>${e.date}</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Time:</span><span>${e.time}</span></div>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+            <button onclick="openCosmicModal(${e.id})" class="text-xs font-semibold text-stellar-400 hover:text-stellar-300">View Details →</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* Rendering Club Events Preview */
+    function renderClubEventsPreview() {
+      const container = document.getElementById('homeClubEventsPreview');
+      if (!container) return;
+      container.innerHTML = clubEvents.slice(0, 3).map(ev => `
+        <div class="bg-space-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div class="h-40 w-full overflow-hidden bg-space-950 relative">
+            <img src="${ev.img}" alt="${ev.title}" class="w-full h-full object-cover">
+            <span class="absolute top-3 left-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-space-900/90 text-cyan-300 border border-cyan-800">${ev.cat}</span>
+            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">${ev.reg}</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <h3 class="font-display font-bold text-base text-white line-clamp-1">${ev.title}</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${ev.desc}</p>
+              <div class="mt-3 text-xs font-mono text-slate-400 space-y-1">
+                <p>📅 ${ev.date}</p>
+                <p>📍 ${ev.loc}</p>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+              <button onclick="openClubModal(${ev.id})" class="text-xs font-medium text-slate-300 hover:text-white">Details</button>
+              ${ev.reg === 'Open' ? `<button onclick="openRegistrationModal('${ev.title}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cosmic-600 text-white">Register</button>` : `<span class="text-xs font-mono text-slate-500">${ev.reg}</span>`}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* Render About Wings & Timeline */
+    function renderAboutPage() {
+      const wings = [
+        { title: 'Observational Astronomy', emoji: '🔭', desc: 'Hands-on sky tracking using optical Dobsonian and refractor telescopes, star charting, and Messier marathons.' },
+        { title: 'Aerospace Engineering', emoji: '🚀', desc: 'Aerodynamic design of fixed-wing RC research drones, Pitot airspeed sensors, and flight telemetry.' },
+        { title: 'Electronics & Embedded', emoji: '⚡', desc: 'Custom PCB design, ESP32/STM32 microcontroller architectures, and 433MHz LoRa sensor telemetry.' },
+        { title: 'Robotics & Automation', emoji: '🤖', desc: 'Design of SANKALP-1 6-wheel rocker-bogie planetary rover featuring LiDAR SLAM and ROS 2 navigation.' },
+        { title: 'Space Tech & CanSat', emoji: '🛰️', desc: 'Engineering miniature 330ml CanSat atmospheric payloads with UV radiometers and parachute recovery.' },
+        { title: 'SDR & Comms Stations', emoji: '📡', desc: 'Rooftop Software Defined Radio ground station tracking and decoding NOAA & Meteor satellite telemetry.' }
+      ];
+      document.getElementById('aboutWingsGrid').innerHTML = wings.map(w => `
+        <div class="p-6 rounded-2xl bg-space-900 border border-slate-800 space-y-2 hover:border-slate-700 transition-colors">
+          <div class="text-3xl">${w.emoji}</div>
+          <h4 class="font-display font-bold text-base text-white">${w.title}</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">${w.desc}</p>
+        </div>
+      `).join('');
+
+      const timeline = [
+        { year: '2023', title: 'Genesis of Antrix at NITPY', desc: 'Physics and electronics students founded the official astronomy & space tech club at NIT Puducherry.' },
+        { year: '2024', title: 'Flagship 8" Dobsonian Telescope Induction', desc: 'Commissioned optical tracking mount and hosted campus-wide stargazing night for 300+ students.' },
+        { year: '2024', title: 'Maiden CanSat Atmospheric Drop Test', desc: 'Fabricated and launched institute\'s first student CanSat payload transmitting live environmental telemetry.' },
+        { year: '2025', title: 'SANKALP-1 Planetary Rover Unveiling', desc: 'Completed prototype of 6-wheel rocker-bogie rover with autonomous LiDAR SLAM obstacle navigation.' },
+        { year: '2025', title: 'National Space Conclave Honors', desc: 'Awarded 2nd Prize for paper on "Cost-Effective Micro-Observatory Automation".' }
+      ];
+      document.getElementById('aboutTimeline').innerHTML = timeline.map(t => `
+        <div class="relative group">
+          <div class="absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full bg-space-950 border-2 border-stellar-400"></div>
+          <div class="p-4 rounded-xl bg-space-900 border border-slate-800 space-y-1">
+            <span class="text-xs font-mono font-bold text-stellar-300">${t.year} • ${t.title}</span>
+            <p class="text-xs text-slate-300 leading-relaxed">${t.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* Render Club Events Page */
+    let currentEventTab = 'upcoming';
+    function filterClubEvents(status) {
+      currentEventTab = status;
+      document.querySelectorAll('.ev-tab-btn').forEach(btn => {
+        btn.classList.remove('text-white', 'border-stellar-400');
+        btn.classList.add('text-slate-400', 'border-transparent');
+      });
+      const activeBtn = document.getElementById('tab-ev-' + status);
+      if (activeBtn) {
+        activeBtn.classList.add('text-white', 'border-stellar-400');
+        activeBtn.classList.remove('text-slate-400', 'border-transparent');
+      }
+
+      const filtered = clubEvents.filter(e => e.status === status);
+      const container = document.getElementById('clubEventsGrid');
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-500 text-sm">No events listed in this tab.</div>`;
+        return;
+      }
+      container.innerHTML = filtered.map(ev => `
+        <div class="bg-space-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div class="h-44 w-full overflow-hidden bg-space-950 relative">
+            <img src="${ev.img}" alt="${ev.title}" class="w-full h-full object-cover">
+            <span class="absolute top-3 left-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-space-900/90 text-cyan-300 border border-cyan-800">${ev.cat}</span>
+            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">${ev.reg}</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <h3 class="font-display font-bold text-base text-white line-clamp-1">${ev.title}</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${ev.desc}</p>
+              <div class="mt-3 text-xs font-mono text-slate-400 space-y-1">
+                <p>📅 ${ev.date} • ${ev.time}</p>
+                <p>📍 ${ev.loc}</p>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
+              <button onclick="openClubModal(${ev.id})" class="text-xs font-medium text-slate-300 hover:text-white">Full Agenda</button>
+              ${ev.reg === 'Open' ? `<button onclick="openRegistrationModal('${ev.title}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cosmic-600 text-white">Register</button>` : `<span class="text-xs font-mono text-slate-500">${ev.reg}</span>`}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* Render Projects Page */
+    let currentProjectCategory = 'All';
+    function renderProjectsPage() {
+      const cats = ['All', 'Astronomy', 'Aerospace', 'Electronics', 'Robotics', 'Space Technology'];
+      document.getElementById('projectCategoryFilters').innerHTML = cats.map(c => `
+        <button onclick="filterProjects('${c}')" class="proj-cat-btn whitespace-nowrap px-3.5 py-1.5 text-xs font-medium rounded-full border transition-all ${c === currentProjectCategory ? 'bg-cosmic-600 text-white border-cosmic-400 shadow' : 'bg-space-850 text-slate-300 border-slate-800 hover:text-white'}">${c}</button>
+      `).join('');
+
+      const filtered = currentProjectCategory === 'All' ? projects : projects.filter(p => p.cat === currentProjectCategory);
+      document.getElementById('projectsGrid').innerHTML = filtered.map(p => `
+        <div class="bg-space-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div class="h-44 w-full overflow-hidden bg-space-950 relative">
+            <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover">
+            <span class="absolute top-3 left-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-space-900/90 text-white border border-slate-700">${p.cat}</span>
+            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">${p.status}</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <h3 class="font-display font-bold text-base text-white line-clamp-1">${p.name}</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${p.desc}</p>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                ${p.tech.map(t => `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-space-850 text-slate-300 border border-slate-800">${t}</span>`).join('')}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+              <span class="text-slate-400 font-mono text-[11px] truncate max-w-[150px]">👥 ${p.team}</span>
+              <button onclick="openProjectModal(${p.id})" class="font-semibold text-stellar-400 hover:text-white">Details ↗</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterProjects(cat) {
+      currentProjectCategory = cat;
+      renderProjectsPage();
+    }
+
+    /* Render Gallery Page */
+    let currentGalleryCategory = 'All';
+    let currentLightboxIdx = 0;
+    function renderGalleryPage() {
+      const cats = ['All', 'Astronomy', 'Telescope Sessions', 'Workshops', 'Projects'];
+      document.getElementById('galleryCategoryFilters').innerHTML = cats.map(c => `
+        <button onclick="filterGallery('${c}')" class="gal-cat-btn whitespace-nowrap px-3.5 py-1.5 text-xs font-medium rounded-full border transition-all ${c === currentGalleryCategory ? 'bg-cosmic-600 text-white border-cosmic-400 shadow' : 'bg-space-850 text-slate-300 border-slate-800 hover:text-white'}">${c}</button>
+      `).join('');
+
+      const filtered = currentGalleryCategory === 'All' ? gallery : gallery.filter(g => g.cat === currentGalleryCategory);
+      document.getElementById('galleryGrid').innerHTML = filtered.map((g, idx) => `
+        <div onclick="openLightbox(${idx})" class="group cursor-pointer rounded-2xl overflow-hidden bg-space-900 border border-slate-800 hover:border-stellar-400/50 transition-all">
+          <div class="relative aspect-[4/3] w-full overflow-hidden bg-space-950">
+            <img src="${g.img}" alt="${g.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-space-950 via-space-950/30 to-transparent"></div>
+            <span class="absolute top-3 left-3 text-[10px] font-mono px-2 py-0.5 rounded-full bg-space-950/80 text-cyan-300 border border-cyan-800">${g.cat}</span>
+            <div class="absolute bottom-0 inset-x-0 p-4 space-y-1">
+              <h4 class="font-display font-bold text-sm text-white line-clamp-1">${g.title}</h4>
+              <p class="text-[11px] text-slate-300 line-clamp-1">${g.desc}</p>
+              <p class="text-[10px] font-mono text-slate-400 pt-1">📅 ${g.date} • 📍 ${g.loc}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterGallery(cat) {
+      currentGalleryCategory = cat;
+      renderGalleryPage();
+    }
+
+    function openLightbox(idx) {
+      currentLightboxIdx = idx;
+      const filtered = currentGalleryCategory === 'All' ? gallery : gallery.filter(g => g.cat === currentGalleryCategory);
+      const item = filtered[idx];
+      if (!item) return;
+      document.getElementById('lightboxTitle').textContent = item.title;
+      document.getElementById('lightboxImg').src = item.img;
+      document.getElementById('lightboxDesc').textContent = item.desc;
+      document.getElementById('lightboxMeta').textContent = `📅 ${item.date} • 📍 ${item.loc} • 🔭 ${item.equip || 'Antrix Optical Mount'}`;
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.add('hidden');
+    }
+    function nextLightbox() {
+      const filtered = currentGalleryCategory === 'All' ? gallery : gallery.filter(g => g.cat === currentGalleryCategory);
+      currentLightboxIdx = (currentLightboxIdx + 1) % filtered.length;
+      openLightbox(currentLightboxIdx);
+    }
+    function prevLightbox() {
+      const filtered = currentGalleryCategory === 'All' ? gallery : gallery.filter(g => g.cat === currentGalleryCategory);
+      currentLightboxIdx = (currentLightboxIdx - 1 + filtered.length) % filtered.length;
+      openLightbox(currentLightboxIdx);
+    }
+
+    /* Render Cosmic Calendar Page */
+    let currentCosmicCat = 'All';
+    let onlyNITPYActive = false;
+    function renderCosmicCalendar() {
+      const cats = ['All', 'Meteor Shower', 'Planetary', 'Lunar', 'Eclipse', 'Space Mission'];
+      document.getElementById('cosmicCategoryFilters').innerHTML = cats.map(c => `
+        <button onclick="filterCosmicCat('${c}')" class="whitespace-nowrap px-3.5 py-1.5 text-xs font-medium rounded-full border transition-all ${c === currentCosmicCat ? 'bg-cosmic-600 text-white border-cosmic-400 shadow' : 'bg-space-850 text-slate-300 border-slate-800 hover:text-white'}">${c}</button>
+      `).join('');
+
+      let filtered = cosmicEvents;
+      if (currentCosmicCat !== 'All') filtered = filtered.filter(e => e.cat === currentCosmicCat);
+      if (onlyNITPYActive) filtered = filtered.filter(e => e.isNITPY);
+
+      document.getElementById('cosmicEventsGrid').innerHTML = filtered.map(e => `
+        <div class="bg-space-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-all">
+          <div class="space-y-2.5">
+            <div class="flex justify-between items-start">
+              <span class="text-2xl">${e.icon}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${e.isNITPY ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-space-850 text-slate-400 border border-slate-700'}">${e.isNITPY ? 'NITPY Horizon' : 'Global / Scope'}</span>
+            </div>
+            <span class="text-[10px] font-mono uppercase text-stellar-400 font-semibold block">${e.cat}</span>
+            <h3 class="font-display font-bold text-base text-white">${e.name}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2">${e.desc}</p>
+            <div class="pt-2 text-xs font-mono text-slate-300 space-y-1">
+              <div class="flex justify-between"><span class="text-slate-500">Date:</span><span>${e.date}</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Peak:</span><span>${e.time}</span></div>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+            <button onclick="openCosmicModal(${e.id})" class="text-xs font-semibold text-stellar-400 hover:text-stellar-300">View Details →</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCosmicCat(c) {
+      currentCosmicCat = c;
+      renderCosmicCalendar();
+    }
+    function toggleOnlyNITPY() {
+      onlyNITPYActive = !onlyNITPYActive;
+      const btn = document.getElementById('btnOnlyNITPY');
+      if (onlyNITPYActive) {
+        btn.className = "px-3.5 py-1.5 rounded-full text-xs font-mono border bg-emerald-950 text-emerald-300 border-emerald-700 shadow flex items-center gap-1.5";
+      } else {
+        btn.className = "px-3.5 py-1.5 rounded-full text-xs font-mono border bg-space-850 text-slate-300 border-slate-700 hover:text-white flex items-center gap-1.5";
+      }
+      renderCosmicCalendar();
+    }
+
+    /* Render Team Page */
+    function renderTeamPage() {
+      const fac = team.filter(m => m.cat === 'faculty');
+      const core = team.filter(m => m.cat === 'core');
+      const mems = team.filter(m => m.cat === 'member');
+
+      document.getElementById('teamFacultyGrid').innerHTML = fac.map(f => `
+        <div class="p-5 rounded-2xl bg-space-900 border border-indigo-900/60 flex items-center gap-4">
+          <img src="${f.avatar}" alt="${f.name}" class="w-16 h-16 rounded-xl object-cover border border-slate-700">
+          <div>
+            <h4 class="font-display font-bold text-white text-base">${f.name}</h4>
+            <p class="text-xs font-mono text-stellar-300">${f.role}</p>
+            <p class="text-[11px] text-slate-400 mt-1">${f.dept}</p>
+            <p class="text-[11px] text-slate-300 mt-1">Focus: ${f.area}</p>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('teamCoreGrid').innerHTML = core.map(c => `
+        <div class="p-5 rounded-2xl bg-space-900 border border-slate-800 hover:border-slate-700 transition-colors flex flex-col justify-between space-y-3">
+          <div class="flex items-center gap-3">
+            <img src="${c.avatar}" alt="${c.name}" class="w-14 h-14 rounded-xl object-cover border border-slate-700">
+            <div>
+              <h4 class="font-display font-bold text-white text-base">${c.name}</h4>
+              <p class="text-xs font-mono text-cyan-300">${c.role}</p>
+              <p class="text-[11px] text-slate-400">${c.dept}</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-300 bg-space-850 p-2.5 rounded-xl border border-slate-800">
+            <span class="text-slate-500 font-mono text-[10px] block uppercase">Domain Focus:</span>
+            ${c.area}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('teamMembersGrid').innerHTML = mems.map(m => `
+        <div class="p-3.5 rounded-xl bg-space-900 border border-slate-800 space-y-2">
+          <div class="flex items-center gap-2.5">
+            <img src="${m.avatar}" alt="${m.name}" class="w-10 h-10 rounded-lg object-cover border border-slate-700">
+            <div>
+              <h5 class="font-display font-bold text-xs text-white">${m.name}</h5>
+              <p class="text-[10px] text-stellar-400 font-mono">${m.role}</p>
+              <p class="text-[10px] text-slate-400 truncate max-w-[130px]">${m.dept}</p>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-300 bg-space-850 p-1.5 rounded border border-slate-800/80">${m.area}</p>
+        </div>
+      `).join('');
+    }
+
+    /* Modal Handlers */
+    function openModal(title, subtitle, bodyHtml) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalSubtitle').textContent = subtitle;
+      document.getElementById('modalBody').innerHTML = bodyHtml;
+      document.getElementById('genericModal').classList.remove('hidden');
+    }
+    function closeModal() {
+      document.getElementById('genericModal').classList.add('hidden');
+    }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeLightbox();
+      }
+    });
+
+    function openCosmicModal(id) {
+      const ev = cosmicEvents.find(e => e.id === id);
+      if (!ev) return;
+      openModal(ev.name, `${ev.cat} • ${ev.date}`, `
+        <div class="p-3 rounded-xl bg-space-850 border border-slate-800 grid grid-cols-2 gap-2 text-xs font-mono">
+          <div><span class="text-slate-400 block">Peak Window:</span><span class="text-stellar-300 font-semibold">${ev.time}</span></div>
+          <div><span class="text-slate-400 block">Visibility:</span><span class="text-emerald-400 font-semibold">${ev.isNITPY ? 'Visible from NIT Puducherry' : 'Global / Scope'}</span></div>
+        </div>
+        <div class="space-y-1 pt-2">
+          <h5 class="text-xs font-mono uppercase text-slate-400 font-semibold">Phenomenon Overview</h5>
+          <p class="text-sm text-slate-200 leading-relaxed">${ev.desc}</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-1">
+          <h5 class="text-xs font-mono uppercase text-stellar-300 font-semibold">NITPY Observation Advice</h5>
+          <p class="text-xs text-slate-300 leading-relaxed">${ev.tips}</p>
+        </div>
+      `);
+    }
+
+    function openClubModal(id) {
+      const ev = clubEvents.find(e => e.id === id);
+      if (!ev) return;
+      openModal(ev.title, `${ev.date} • ${ev.loc}`, `
+        <img src="${ev.img}" alt="${ev.title}" class="w-full h-48 object-cover rounded-xl">
+        <p class="text-sm text-slate-200 leading-relaxed">${ev.desc}</p>
+        <div class="p-3 rounded-xl bg-space-850 border border-slate-800 text-xs font-mono space-y-1">
+          <p>📅 Schedule: ${ev.date} (${ev.time})</p>
+          <p>📍 Location: ${ev.loc}</p>
+          <p>🎟️ Registration: ${ev.reg}</p>
+        </div>
+        ${ev.reg === 'Open' ? `<div class="pt-2 flex justify-end"><button onclick="closeModal(); openRegistrationModal('${ev.title}');" class="px-4 py-2 rounded-lg text-xs font-semibold bg-cosmic-600 text-white">Register Now</button></div>` : ''}
+      `);
+    }
+
+    function openProjectModal(id) {
+      const p = projects.find(i => i.id === id);
+      if (!p) return;
+      openModal(p.name, `${p.cat} • ${p.status}`, `
+        <img src="${p.img}" alt="${p.name}" class="w-full h-52 object-cover rounded-xl">
+        <div class="space-y-1">
+          <h5 class="text-xs font-mono uppercase text-slate-400 font-semibold">Architecture & Engineering</h5>
+          <p class="text-sm text-slate-200 leading-relaxed">${p.desc}</p>
+        </div>
+        <div class="space-y-1">
+          <h5 class="text-xs font-mono uppercase text-slate-400 font-semibold">Technologies</h5>
+          <div class="flex flex-wrap gap-1.5">
+            ${p.tech.map(t => `<span class="text-xs font-mono px-2.5 py-1 rounded bg-space-850 text-cyan-300 border border-slate-700">${t}</span>`).join('')}
+          </div>
+        </div>
+        <div class="p-3 rounded-xl bg-space-850 border border-slate-800 text-xs font-mono">
+          <span class="text-slate-400 block uppercase">Student Team:</span>
+          <span class="text-white">${p.team}</span>
+        </div>
+      `);
+    }
+
+    function openRegistrationModal(title) {
+      openModal('Event Registration', title, `
+        <form onsubmit="handleRegistrationSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">Full Name</label>
+            <input required type="text" placeholder="e.g. Arun Kumar" class="w-full px-3 py-2 rounded-lg bg-space-850 border border-slate-700 text-sm text-white focus:outline-none focus:border-stellar-400">
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">Student Roll ID</label>
+            <input required type="text" placeholder="e.g. EC22B1042" class="w-full px-3 py-2 rounded-lg bg-space-850 border border-slate-700 text-sm text-white focus:outline-none focus:border-stellar-400">
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">Institute Email</label>
+            <input required type="email" placeholder="student@nitpy.ac.in" class="w-full px-3 py-2 rounded-lg bg-space-850 border border-slate-700 text-sm text-white focus:outline-none focus:border-stellar-400">
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold bg-cosmic-600 text-white hover:bg-cosmic-500">Submit Registration</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      document.getElementById('modalBody').innerHTML = `
+        <div class="p-6 text-center space-y-3">
+          <div class="text-4xl">🎉</div>
+          <h4 class="text-lg font-bold text-white font-display">Registration Confirmed!</h4>
+          <p class="text-xs text-slate-300">You are registered. Check your institute email for details and venue briefing.</p>
+          <button onclick="closeModal()" class="mt-4 px-4 py-2 rounded-lg text-xs bg-space-800 text-white">Done</button>
+        </div>
+      `;
+    }
+
+    /* ======================== STAR TRACKER CANVAS MAP ======================== */
+    let selectedStarObj = celestialObjects[0];
+    let trackerZoom = 1;
+    let trackerPan = { x: 0, y: 0 };
+    let trackerDragging = false;
+    let trackerDragStart = { x: 0, y: 0 };
+    let layers = { constellations: true, planets: true, dso: true, grid: true };
+
+    function initSkyMap() {
+      const select = document.getElementById('quickTargetSelect');
+      if (select) {
+        select.innerHTML = celestialObjects.map(o => `<option value="${o.id}">${o.name} (${o.type})</option>`).join('');
+      }
+      const chips = document.getElementById('quickTargetsChips');
+      if (chips) {
+        chips.innerHTML = ['sirius', 'jupiter', 'betelgeuse', 'orion-nebula', 'pleiades', 'saturn'].map(id => {
+          const o = celestialObjects.find(c => c.id === id);
+          if (!o) return '';
+          return `<button onclick="selectTargetById('${id}')" class="text-xs px-2.5 py-1 rounded-lg font-mono border border-slate-800 bg-space-850 text-slate-300 hover:text-white">${o.name.split(' ')[0]}</button>`;
+        }).join('');
+      }
+
+      renderInspectorCard();
+      renderSkyMap();
+      setupSkyMapEvents();
+    }
+
+    function setupSkyMapEvents() {
+      const canvas = document.getElementById('skyMapCanvas');
+      if (!canvas) return;
+
+      canvas.onmousedown = (e) => {
+        trackerDragging = true;
+        trackerDragStart = { x: e.clientX - trackerPan.x, y: e.clientY - trackerPan.y };
+      };
+      window.onmousemove = (e) => {
+        if (!trackerDragging) return;
+        trackerPan.x = e.clientX - trackerDragStart.x;
+        trackerPan.y = e.clientY - trackerDragStart.y;
+        renderSkyMap();
+      };
+      window.onmouseup = () => { trackerDragging = false; };
+
+      canvas.onclick = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const radius = Math.min(width, height) * 0.44 * trackerZoom;
+        const cx = width / 2 + trackerPan.x;
+        const cy = height / 2 + trackerPan.y;
+
+        let matched = null;
+        let minDist = 22;
+
+        celestialObjects.forEach(obj => {
+          const ox = cx + (obj.x / 50 - 1) * radius * 0.9;
+          const oy = cy + (obj.y / 50 - 1) * radius * 0.9;
+          const dist = Math.hypot(clickX - ox, clickY - oy);
+          if (dist < minDist) {
+            matched = obj;
+            minDist = dist;
+          }
+        });
+
+        if (matched) {
+          selectedStarObj = matched;
+          renderInspectorCard();
+          renderSkyMap();
+        }
+      };
+    }
+
+    function renderSkyMap() {
+      const canvas = document.getElementById('skyMapCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const parent = canvas.parentElement;
+      const width = (canvas.width = parent.clientWidth);
+      const height = (canvas.height = parent.clientHeight);
+
+      const radius = Math.min(width, height) * 0.44 * trackerZoom;
+      const cx = width / 2 + trackerPan.x;
+      const cy = height / 2 + trackerPan.y;
+
+      document.getElementById('fovReadout').textContent = `${Math.round(180 / trackerZoom)}°`;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Sky hemisphere dome clip
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.clip();
+
+      // Sky gradient
+      const grad = ctx.createRadialGradient(cx, cy, radius * 0.1, cx, cy, radius);
+      grad.addColorStop(0, '#0a1226');
+      grad.addColorStop(0.7, '#060b18');
+      grad.addColorStop(1, '#02050e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+
+      // Alt/Azimuth Grid
+      if (layers.grid) {
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 5]);
+        [0.33, 0.66].forEach(f => {
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius * f, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+        ctx.beginPath();
+        ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy);
+        ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.strokeStyle = 'rgba(34, 211, 238, 0.3)';
+        ctx.beginPath();
+        ctx.moveTo(cx - 6, cy); ctx.lineTo(cx + 6, cy);
+        ctx.moveTo(cx, cy - 6); ctx.lineTo(cx, cy + 6);
+        ctx.stroke();
+      }
+
+      // Constellation Lines
+      if (layers.constellations) {
+        ctx.strokeStyle = 'rgba(99, 102, 241, 0.35)';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([4, 4]);
+
+        const links = [
+          ['betelgeuse', 'rigel'],
+          ['betelgeuse', 'orion-nebula'],
+          ['rigel', 'orion-nebula'],
+          ['sirius', 'betelgeuse'],
+          ['betelgeuse', 'aldebaran'],
+          ['aldebaran', 'pleiades']
+        ];
+        links.forEach(([id1, id2]) => {
+          const s1 = celestialObjects.find(o => o.id === id1);
+          const s2 = celestialObjects.find(o => o.id === id2);
+          if (s1 && s2) {
+            const x1 = cx + (s1.x / 50 - 1) * radius * 0.9;
+            const y1 = cy + (s1.y / 50 - 1) * radius * 0.9;
+            const x2 = cx + (s2.x / 50 - 1) * radius * 0.9;
+            const y2 = cy + (s2.y / 50 - 1) * radius * 0.9;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+          }
+        });
+        ctx.setLineDash([]);
+      }
+
+      // Draw Objects
+      const query = (document.getElementById('trackerSearch')?.value || '').toLowerCase();
+
+      celestialObjects.forEach(obj => {
+        if (query && !obj.name.toLowerCase().includes(query) && !obj.const.toLowerCase().includes(query)) return;
+        if (obj.type === 'Planet' && !layers.planets) return;
+        if ((obj.type === 'Nebula' || obj.type === 'Galaxy' || obj.type === 'Cluster') && !layers.dso) return;
+
+        const ox = cx + (obj.x / 50 - 1) * radius * 0.9;
+        const oy = cy + (obj.y / 50 - 1) * radius * 0.9;
+        const isSelected = selectedStarObj && selectedStarObj.id === obj.id;
+
+        // Selection Reticle
+        if (isSelected) {
+          ctx.beginPath();
+          ctx.arc(ox, oy, obj.size + 8, 0, Math.PI * 2);
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(ox - 14, oy); ctx.lineTo(ox - 8, oy);
+          ctx.moveTo(ox + 8, oy); ctx.lineTo(ox + 14, oy);
+          ctx.moveTo(ox, oy - 14); ctx.lineTo(ox, oy - 8);
+          ctx.moveTo(ox, oy + 8); ctx.lineTo(ox, oy + 14);
+          ctx.stroke();
+        }
+
+        // Glow
+        const glow = ctx.createRadialGradient(ox, oy, 1, ox, oy, obj.size * 2.5);
+        glow.addColorStop(0, obj.color);
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(ox, oy, obj.size * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core
+        ctx.beginPath();
+        ctx.arc(ox, oy, obj.size * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Label
+        ctx.font = '11px "Space Grotesk", sans-serif';
+        ctx.fillStyle = isSelected ? '#38bdf8' : '#cbd5e1';
+        ctx.textAlign = 'left';
+        ctx.fillText(obj.name.split(' ')[0], ox + obj.size + 4, oy + 3);
+      });
+
+      ctx.restore();
+
+      // Horizon Circle & Cardinal Labels
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const cardinals = [
+        { l: 'N (NITPY)', a: -Math.PI / 2 },
+        { l: 'E (Coast)', a: 0 },
+        { l: 'S', a: Math.PI / 2 },
+        { l: 'W', a: Math.PI }
+      ];
+      ctx.font = 'bold 12px "Space Grotesk", sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      cardinals.forEach(c => {
+        const x = cx + Math.cos(c.a) * (radius + 20);
+        const y = cy + Math.sin(c.a) * (radius + 20);
+        ctx.fillText(c.l, x, y);
+      });
+    }
+
+    function renderInspectorCard() {
+      const card = document.getElementById('targetInspectorCard');
+      if (!card || !selectedStarObj) return;
+      card.innerHTML = `
+        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+          <div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">${selectedStarObj.type}</span>
+            <h3 class="font-display font-bold text-xl text-white mt-1 flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full" style="background:${selectedStarObj.color}"></span>
+              ${selectedStarObj.name}
+            </h3>
+            <p class="text-xs font-mono text-slate-400">Constellation: ${selectedStarObj.const}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div class="p-2.5 rounded-xl bg-space-850 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase block">Apparent Mag</span>
+            <span class="text-sm font-bold text-white">${selectedStarObj.mag}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-space-850 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase block">Visibility</span>
+            <span class="text-sm font-bold text-emerald-400">${selectedStarObj.vis}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-space-850 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase block">Altitude</span>
+            <span class="text-xs text-stellar-300 font-semibold">${selectedStarObj.alt}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-space-850 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase block">Azimuth</span>
+            <span class="text-xs text-stellar-300 font-semibold">${selectedStarObj.az}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-space-850 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase block">RA:</span>
+            <span class="text-[11px] text-slate-200">${selectedStarObj.ra}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-space-850 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase block">Dec:</span>
+            <span class="text-[11px] text-slate-200">${selectedStarObj.dec}</span>
+          </div>
+        </div>
+
+        <div class="text-xs py-1.5 px-3 rounded-lg bg-space-850 text-slate-300 flex justify-between">
+          <span class="text-slate-500">Distance:</span>
+          <span class="font-mono text-white">${selectedStarObj.dist}</span>
+        </div>
+
+        <div class="space-y-1">
+          <h5 class="text-[11px] font-mono uppercase text-slate-400 font-semibold">Observation Notes</h5>
+          <p class="text-xs text-slate-300 leading-relaxed bg-space-850/50 p-3 rounded-xl border border-slate-800">${selectedStarObj.desc}</p>
+        </div>
+
+        <div class="pt-2 text-[10px] font-mono text-emerald-400 flex justify-between">
+          <span>Obs Datum: NITPY Coast</span>
+          <span>● Locked on Target</span>
+        </div>
+      `;
+    }
+
+    function selectTargetById(id) {
+      const o = celestialObjects.find(c => c.id === id);
+      if (o) {
+        selectedStarObj = o;
+        renderInspectorCard();
+        renderSkyMap();
+      }
+    }
+
+    function toggleTrackerLayer(layer) {
+      layers[layer] = !layers[layer];
+      const btn = document.getElementById('toggle' + layer.charAt(0).toUpperCase() + layer.slice(1));
+      if (btn) {
+        if (layers[layer]) {
+          btn.classList.remove('bg-space-850', 'text-slate-400', 'border-slate-800');
+          btn.classList.add('bg-cyan-950', 'text-cyan-300', 'border-cyan-700');
+        } else {
+          btn.classList.add('bg-space-850', 'text-slate-400', 'border-slate-800');
+          btn.classList.remove('bg-cyan-950', 'text-cyan-300', 'border-cyan-700');
+        }
+      }
+      renderSkyMap();
+    }
+
+    function zoomSkyMap(delta) {
+      trackerZoom = Math.min(Math.max(0.7, trackerZoom + delta), 2.2);
+      renderSkyMap();
+    }
+    function resetSkyMap() {
+      trackerZoom = 1;
+      trackerPan = { x: 0, y: 0 };
+      renderSkyMap();
+    }
+
+    function switchTrackerMobileView(view) {
+      const mapCol = document.getElementById('trackerMapCol');
+      const inspCol = document.getElementById('trackerInspectorCol');
+      const mapBtn = document.getElementById('mobileViewMapBtn');
+      const inspBtn = document.getElementById('mobileViewInspBtn');
+
+      if (view === 'map') {
+        mapCol.classList.remove('hidden');
+        inspCol.classList.add('hidden');
+        mapBtn.className = "flex-1 py-2 rounded-lg bg-space-800 text-white font-bold";
+        inspBtn.className = "flex-1 py-2 rounded-lg text-slate-400";
+      } else {
+        mapCol.classList.add('hidden');
+        inspCol.classList.remove('hidden');
+        mapBtn.className = "flex-1 py-2 rounded-lg text-slate-400";
+        inspBtn.className = "flex-1 py-2 rounded-lg bg-space-800 text-white font-bold";
+      }
+    }
+
+    /* ======================== BACKGROUND CANVAS TWINKLE ======================== */
+    function initCelestialBackground() {
+      const canvas = document.getElementById('celestialCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let w = (canvas.width = window.innerWidth);
+      let h = (canvas.height = window.innerHeight);
+
+      const stars = Array.from({ length: 120 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.2 + 0.4,
+        a: Math.random() * 0.5 + 0.2,
+        speed: Math.random() * 0.02 + 0.005,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      let t = 0;
+      function animate() {
+        t += 0.01;
+        ctx.clearRect(0, 0, w, h);
+
+        // Orbital line
+        ctx.save();
+        ctx.translate(w * 0.5, h * 0.4);
+        ctx.rotate(-0.25);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, w * 0.38, h * 0.22, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(34, 211, 238, 0.06)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 12]);
+        ctx.stroke();
+        ctx.restore();
+
+        // Stars
+        stars.forEach(s => {
+          const alpha = s.a + Math.sin(t * s.speed * 50 + s.phase) * 0.15;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(226, 232, 240, ${Math.max(0.1, alpha)})`;
+          ctx.fill();
+        });
+
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    /* Initialize all views on window load */
+    window.addEventListener('DOMContentLoaded', () => {
+      initCelestialBackground();
+      renderTonightPlanets();
+      renderCosmicPreview();
+      renderClubEventsPreview();
+      renderAboutPage();
+      filterClubEvents('upcoming');
+      renderProjectsPage();
+      renderGalleryPage();
+      renderCosmicCalendar();
+      renderTeamPage();
+
+      // Check hash
+      const hash = window.location.hash.replace('#', '');
+      if (['home', 'about', 'events', 'projects', 'gallery', 'tracker', 'calendar', 'team'].includes(hash)) {
+        switchTab(hash);
+      } else {
+        switchTab('home');
+      }
+    });
+  </script>
+</body>
+</html>
